@@ -46,11 +46,25 @@ export default function ProfileScreen({ navigation }) {
           style={{ marginTop: 16 }}
         />
         <BtnOutline
+          title="Moje rezerwacje"
+          icon={<Icon name="id-card" size={13} color="#fff" />}
+          onPress={() => navigation.navigate('MyBookings')}
+          style={{ marginTop: 9 }}
+        />
+        <BtnOutline
           title="Ustawienia konta"
           icon={<Icon name="settings" size={13} color="#fff" />}
           onPress={() => navigation.navigate('Settings')}
           style={{ marginTop: 9 }}
         />
+        {profile.role === 'ADMIN' && (
+          <BtnOutline
+            title="Zarzadzaj autami"
+            icon={<Icon name="settings" size={13} color="#fff" />}
+            onPress={() => navigation.navigate('AdminCars')}
+            style={{ marginTop: 9 }}
+          />
+        )}
 
         <View style={s.docsSection}>
           <Text style={s.docsTitle}>Dokumenty</Text>

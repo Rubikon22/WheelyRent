@@ -1,21 +1,25 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { COLORS } from '../constants/theme';
 import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
+import { CARS } from '../constants/cars';
+import { api } from '../api/client';
+import { normalizeCars } from '../utils/cars';
 
-const MARKERS = [
-  { lat: 52.2350, lng: 21.0000, title: 'Ford Mustang, 2024 — 350zł/dzień' },
-  { lat: 52.2220, lng: 21.0180, title: 'Audi Q5 Sportback, 2021 — 230zł/dzień' },
-  { lat: 52.2380, lng: 21.0250, title: 'Suzuki Ertiga XL7, 2020 — 180zł/dzień' },
-  { lat: 52.2270, lng: 20.9950, title: 'BMW 320i, 2023 — 290zł/dzień' },
-  { lat: 52.2190, lng: 21.0300, title: 'Toyota Corolla, 2022 — 200zł/dzień' },
-  { lat: 52.2410, lng: 21.0080, title: 'Mercedes C200, 2023 — 320zł/dzień' },
-  { lat: 52.2150, lng: 21.0050, title: 'Volkswagen Golf, 2021 — 170zł/dzień' },
-];
+const LOCAL_COORDS = {
+  mustang: { latitude: 52.2350, longitude: 21.0000 },
+  audi: { latitude: 52.2220, longitude: 21.0180 },
+  suzuki: { latitude: 52.2380, longitude: 21.0250 },
+  bmw: { latitude: 52.2270, longitude: 20.9950 },
+  toyota: { latitude: 52.2190, longitude: 21.0300 },
+  mercedes: { latitude: 52.2410, longitude: 21.0080 },
+  vw: { latitude: 52.2150, longitude: 21.0050 },
+};
 
-const mapHtml = `
+function buildMapHtml(markers) {
+  return `
 <!DOCTYPE html>
 <html>
 <head>
@@ -44,7 +48,7 @@ const mapHtml = `
       popupAnchor: [1, -34],
     });
 
-    var markers = ${JSON.stringify(MARKERS)};
+    var markers = ${JSON.stringify(markers)};
     markers.forEach(function(m) {
       L.marker([m.lat, m.lng], { icon: icon }).addTo(map).bindPopup(m.title);
     });
@@ -52,21 +56,51 @@ const mapHtml = `
 </body>
 </html>
 `;
+}
 
 export default function MapScreen({ navigation }) {
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    api.getCars()
+      .then(data => active && setCars(normalizeCars(data)))
+      .catch(() => {
+        if (!active) return;
+        setCars(CARS.map(car => ({ ...car, ...(LOCAL_COORDS[car.id] || {}) })));
+      })
+      .finally(() => active && setLoading(false));
+    return () => { active = false; };
+  }, []);
+
+  const markers = cars
+    .filter(car => car.latitude && car.longitude)
+    .map(car => ({
+      lat: car.latitude,
+      lng: car.longitude,
+      title: `${car.name} - ${car.price}zl/dzien`,
+    }));
+
+  const mapHtml = useMemo(() => buildMapHtml(markers), [markers]);
+
   return (
     <Screen>
       <Text style={s.title}>Zobacz auta obok ciebie</Text>
 
       <View style={s.mapWrap}>
-        <WebView
-          source={{ html: mapHtml }}
-          style={{ flex: 1 }}
-          javaScriptEnabled
-          domStorageEnabled
-          originWhitelist={['*']}
-          scrollEnabled={false}
-        />
+        {loading ? (
+          <ActivityIndicator color={COLORS.primary} style={{ flex: 1 }} />
+        ) : (
+          <WebView
+            source={{ html: mapHtml }}
+            style={{ flex: 1 }}
+            javaScriptEnabled
+            domStorageEnabled
+            originWhitelist={['*']}
+            scrollEnabled={false}
+          />
+        )}
       </View>
 
       <BtnPrimary title="Home" onPress={() => navigation.navigate('HomeTab')} style={{ marginTop: 14 }} />

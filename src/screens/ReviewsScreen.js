@@ -7,7 +7,7 @@ import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
 
 export default function ReviewsScreen({ route, navigation }) {
-  const car = CARS.find(c => c.id === route.params.carId);
+  const car = route.params?.car || CARS.find(c => c.id === route.params.carId);
   if (!car) return null;
 
   return (

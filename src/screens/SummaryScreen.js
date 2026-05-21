@@ -1,43 +1,52 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { COLORS } from '../constants/theme';
-import { CARS, EXTRA_OPTION_PRICE } from '../constants/cars';
 import CarPlaceholder from '../components/CarPlaceholder';
 import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
+import BackHeader from '../components/BackHeader';
+import { getFallbackCar } from '../utils/cars';
 
 export default function SummaryScreen({ route, navigation }) {
-  const car = CARS.find(c => c.id === route.params.carId);
+  const car = route.params.car || getFallbackCar(route.params.carId);
   if (!car) return null;
 
-  const extras = route.params.extras || '—';
+  const extras = route.params.extras || '-';
   const extrasCount = route.params.extrasCount || 0;
+  const extrasPerDay = route.params.extrasPerDay || 0;
+  const extrasOnce = route.params.extrasOnce || 0;
   const [days, setDays] = useState(1);
 
   const carCost = car.price * days;
-  const extrasCost = extrasCount * EXTRA_OPTION_PRICE * days;
+  const extrasDailyCost = extrasPerDay * days;
+  const extrasCost = extrasDailyCost + extrasOnce;
   const total = carCost + extrasCost;
 
   return (
     <Screen>
+      <BackHeader navigation={navigation} />
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
-        <Text style={s.title}>Podsumowanie zamówienia</Text>
-        <CarPlaceholder kind={car.id} style={s.heroImg} />
+        <Text style={s.title}>Podsumowanie zamowienia</Text>
+        <CarPlaceholder kind={car.localId || car.id} style={s.heroImg} />
 
         <View style={s.details}>
-          <Text style={s.line}>Samochód: {car.short}</Text>
-          <Text style={s.line}>Cena: {car.price} zł/dzień</Text>
+          <Text style={s.line}>Samochod: {car.short}</Text>
+          <Text style={s.line}>Cena: {car.price} zl/dzien</Text>
           <Text style={s.line}>Miasto: Warszawa</Text>
           <Text style={s.line}>Opcje dodatkowe: <Text style={{ color: COLORS.textDim }}>{extras}</Text></Text>
           {extrasCount > 0 && (
-            <Text style={s.lineSmall}>{extrasCount} × {EXTRA_OPTION_PRICE} zł/dzień = +{extrasCount * EXTRA_OPTION_PRICE} zł/dzień</Text>
+            <Text style={s.lineSmall}>
+              {extrasPerDay > 0 ? `+${extrasPerDay} zl/dzien` : ''}
+              {extrasPerDay > 0 && extrasOnce > 0 ? '  •  ' : ''}
+              {extrasOnce > 0 ? `+${extrasOnce} zl jednorazowo` : ''}
+            </Text>
           )}
         </View>
 
         <Text style={s.daysLabel}>Czas wynajmu (dni)</Text>
         <View style={s.daysRow}>
           <TouchableOpacity style={s.daysBtn} onPress={() => setDays(d => Math.max(1, d - 1))}>
-            <Text style={s.daysBtnText}>−</Text>
+            <Text style={s.daysBtnText}>-</Text>
           </TouchableOpacity>
           <View style={s.daysDisplay}>
             <Text style={s.daysValue}>{days}</Text>
@@ -56,24 +65,34 @@ export default function SummaryScreen({ route, navigation }) {
 
         <View style={s.breakdown}>
           <View style={s.breakdownRow}>
-            <Text style={s.breakdownLabel}>Samochód ({days} dni)</Text>
-            <Text style={s.breakdownVal}>{carCost} zł</Text>
+            <Text style={s.breakdownLabel}>Samochod ({days} dni)</Text>
+            <Text style={s.breakdownVal}>{carCost} zl</Text>
           </View>
-          {extrasCount > 0 && (
+          {extrasPerDay > 0 && (
             <View style={s.breakdownRow}>
-              <Text style={s.breakdownLabel}>Opcje dodatkowe ({days} dni)</Text>
-              <Text style={s.breakdownVal}>{extrasCost} zł</Text>
+              <Text style={s.breakdownLabel}>Opcje dzienne ({days} dni)</Text>
+              <Text style={s.breakdownVal}>{extrasDailyCost} zl</Text>
+            </View>
+          )}
+          {extrasOnce > 0 && (
+            <View style={s.breakdownRow}>
+              <Text style={s.breakdownLabel}>Opcje jednorazowe</Text>
+              <Text style={s.breakdownVal}>{extrasOnce} zl</Text>
             </View>
           )}
           <View style={s.divider} />
           <View style={s.breakdownRow}>
-            <Text style={s.totalLabel}>Summa</Text>
-            <Text style={s.totalVal}>{total} zł</Text>
+            <Text style={s.totalLabel}>Suma</Text>
+            <Text style={s.totalVal}>{total} zl</Text>
           </View>
         </View>
       </ScrollView>
 
-      <BtnPrimary title="Zapłać" onPress={() => navigation.navigate('Payment')} style={{ marginBottom: 4 }} />
+      <BtnPrimary
+        title="Zaplac"
+        onPress={() => navigation.navigate('Payment', { carId: car.serverId || car.id, car, days, total, extrasCost })}
+        style={{ marginBottom: 4 }}
+      />
     </Screen>
   );
 }
@@ -84,7 +103,6 @@ const s = StyleSheet.create({
   details: { marginTop: 12, gap: 7 },
   line: { color: COLORS.text, fontWeight: '700', fontSize: 13 },
   lineSmall: { color: COLORS.textMute, fontWeight: '600', fontSize: 11, marginLeft: 4 },
-
   daysLabel: { color: COLORS.text, fontWeight: '800', fontSize: 14, marginTop: 20 },
   daysRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 10 },
   daysBtn: {
@@ -105,7 +123,6 @@ const s = StyleSheet.create({
   quickBtnActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
   quickText: { color: COLORS.textDim, fontWeight: '700', fontSize: 12 },
   quickTextActive: { color: '#fff' },
-
   breakdown: {
     marginTop: 20, backgroundColor: COLORS.bgCard, borderRadius: 12,
     borderWidth: 1, borderColor: COLORS.border, padding: 14, gap: 8,

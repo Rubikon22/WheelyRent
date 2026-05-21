@@ -3,7 +3,9 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'reac
 import { COLORS } from '../constants/theme';
 import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
+import BackHeader from '../components/BackHeader';
 import { useProfile } from '../context/ProfileContext';
+import { api } from '../api/client';
 
 function CardIcon({ type }) {
   if (type === 'visa') {
@@ -21,24 +23,30 @@ function CardIcon({ type }) {
   );
 }
 
+function addDays(date, days) {
+  const copy = new Date(date);
+  copy.setDate(copy.getDate() + days);
+  return copy;
+}
+
 const cs = StyleSheet.create({
   brandTile: { width: 42, height: 26, borderRadius: 4, alignItems: 'center', justifyContent: 'center', position: 'relative' },
   brandText: { color: '#fff', fontWeight: '800', fontSize: 11 },
   mcCircle: { width: 14, height: 14, borderRadius: 7, position: 'absolute' },
 });
 
-export default function PaymentScreen({ navigation }) {
+export default function PaymentScreen({ route, navigation }) {
   const { profile, addCard } = useProfile();
   const [selected, setSelected] = useState(profile.cards[0]?.id || null);
-
   const [showAdd, setShowAdd] = useState(false);
   const [newNum, setNewNum] = useState('');
   const [newType, setNewType] = useState('visa');
+  const [loading, setLoading] = useState(false);
 
   const handleAdd = () => {
     const digits = newNum.replace(/\s/g, '');
     if (digits.length < 4) {
-      Alert.alert('Błąd', 'Podaj przynajmniej 4 ostatnie cyfry karty');
+      Alert.alert('Blad', 'Podaj przynajmniej 4 ostatnie cyfry karty');
       return;
     }
     addCard({ type: newType, last4: digits.slice(-4) });
@@ -46,17 +54,40 @@ export default function PaymentScreen({ navigation }) {
     setShowAdd(false);
   };
 
-  const handlePay = () => {
+  const handlePay = async () => {
+    if (loading) return;
     if (!selected) {
-      Alert.alert('Błąd', 'Wybierz metodę płatności');
+      Alert.alert('Blad', 'Wybierz metode platnosci');
       return;
     }
-    navigation.navigate('ConfirmSuccess');
+    if (!route.params?.carId) {
+      navigation.navigate('ConfirmFail');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const startDate = addDays(new Date(), 1);
+      const endDate = addDays(startDate, route.params.days || 1);
+      const booking = await api.createBooking(route.params.carId, startDate.toISOString(), endDate.toISOString(), route.params.extrasCost || 0);
+      navigation.navigate('ConfirmSuccess', {
+        booking,
+        car: route.params.car,
+        days: route.params.days,
+        total: route.params.total,
+      });
+    } catch (e) {
+      Alert.alert('Rezerwacja nieudana', e.message);
+      navigation.navigate('ConfirmFail');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <Screen>
-      <Text style={s.title}>Wybierz metodę płatności</Text>
+      <BackHeader navigation={navigation} />
+      <Text style={s.title}>Wybierz metode platnosci</Text>
 
       <View style={{ gap: 10 }}>
         {profile.cards.map(card => (
@@ -74,12 +105,12 @@ export default function PaymentScreen({ navigation }) {
       </View>
 
       {profile.cards.length === 0 && (
-        <Text style={s.noCards}>Brak zapisanych kart. Dodaj kartę poniżej.</Text>
+        <Text style={s.noCards}>Brak zapisanych kart. Dodaj karte ponizej.</Text>
       )}
 
       {!showAdd ? (
         <TouchableOpacity style={s.addBtn} onPress={() => setShowAdd(true)}>
-          <Text style={s.addBtnText}>+ Dodaj metodę płatności</Text>
+          <Text style={s.addBtnText}>+ Dodaj metode platnosci</Text>
         </TouchableOpacity>
       ) : (
         <View style={s.addForm}>
@@ -119,7 +150,7 @@ export default function PaymentScreen({ navigation }) {
 
       <View style={{ flex: 1 }} />
 
-      <BtnPrimary title="Zapłać" onPress={handlePay} style={{ marginBottom: 4 }} />
+      <BtnPrimary title={loading ? 'Rezerwacja...' : 'Zaplac'} onPress={handlePay} style={{ marginBottom: 4 }} />
     </Screen>
   );
 }

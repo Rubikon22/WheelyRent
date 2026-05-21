@@ -6,7 +6,7 @@ import { CARS } from '../constants/cars';
 const PALETTE_CACHE = {};
 function getPalette(kind) {
   if (PALETTE_CACHE[kind]) return PALETTE_CACHE[kind];
-  const car = CARS.find(c => c.id === kind);
+  const car = CARS.find(c => c.id === kind || c.id === kind?.externalId || c.id === kind?.localId);
   const p = car ? { bg: car.color, car: car.carColor } : { bg: '#888', car: '#555' };
   PALETTE_CACHE[kind] = p;
   return p;

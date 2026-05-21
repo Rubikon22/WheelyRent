@@ -1,11 +1,48 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { COLORS } from '../constants/theme';
 import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
+import { api, setToken } from '../api/client';
+import { useProfile } from '../context/ProfileContext';
 
 export default function RegisterScreen({ navigation }) {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
   const [agreed, setAgreed] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { updateProfile } = useProfile();
+
+  const handleRegister = async () => {
+    if (loading) return;
+
+    if (!name.trim() || !email.trim() || !password) {
+      Alert.alert('Błąd', 'Wypełnij imię, email i hasło');
+      return;
+    }
+    if (password.length < 6) {
+      Alert.alert('Błąd', 'Hasło musi mieć co najmniej 6 znaków');
+      return;
+    }
+    if (!agreed) {
+      Alert.alert('Błąd', 'Zaakceptuj warunki i politykę prywatności');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { token, user } = await api.register(name.trim(), email.trim(), password);
+      setToken(token);
+      updateProfile({ name: user.name, email: user.email, role: user.role });
+      navigation.replace('Main');
+    } catch (e) {
+      Alert.alert('Rejestracja nieudana', e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Screen>
@@ -14,10 +51,10 @@ export default function RegisterScreen({ navigation }) {
         <Text style={s.title}>Załóż konto</Text>
 
         <View style={s.form}>
-          <TextInput style={s.input} placeholder="Imię i nazwisko" placeholderTextColor={COLORS.textMute} />
-          <TextInput style={s.input} placeholder="Email" placeholderTextColor={COLORS.textMute} keyboardType="email-address" autoCapitalize="none" />
-          <TextInput style={s.input} placeholder="Numer telefonu" placeholderTextColor={COLORS.textMute} keyboardType="phone-pad" />
-          <TextInput style={s.input} placeholder="Hasło" placeholderTextColor={COLORS.textMute} secureTextEntry />
+          <TextInput style={s.input} placeholder="Imię i nazwisko" placeholderTextColor={COLORS.textMute} value={name} onChangeText={setName} editable={!loading} />
+          <TextInput style={s.input} placeholder="Email" placeholderTextColor={COLORS.textMute} value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" editable={!loading} />
+          <TextInput style={s.input} placeholder="Numer telefonu" placeholderTextColor={COLORS.textMute} value={phone} onChangeText={setPhone} keyboardType="phone-pad" editable={!loading} />
+          <TextInput style={s.input} placeholder="Hasło" placeholderTextColor={COLORS.textMute} value={password} onChangeText={setPassword} secureTextEntry editable={!loading} />
         </View>
 
         <TouchableOpacity style={s.checkRow} onPress={() => setAgreed(!agreed)}>
@@ -25,7 +62,7 @@ export default function RegisterScreen({ navigation }) {
           <Text style={s.checkText}>Akceptuję warunki i politykę{'\n'}prywatności</Text>
         </TouchableOpacity>
 
-        <BtnPrimary title="Zarejestruj się" onPress={() => navigation.replace('Main')} style={{ marginTop: 22 }} />
+        <BtnPrimary title={loading ? 'Rejestracja...' : 'Zarejestruj się'} onPress={handleRegister} style={{ marginTop: 22 }} />
       </ScrollView>
     </Screen>
   );

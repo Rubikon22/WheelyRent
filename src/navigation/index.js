@@ -23,6 +23,8 @@ import NotificationsScreen from '../screens/NotificationsScreen';
 import ExtraOptionsScreen from '../screens/ExtraOptionsScreen';
 import HelpScreen from '../screens/HelpScreen';
 import HelpAnswerScreen from '../screens/HelpAnswerScreen';
+import AdminCarsScreen from '../screens/AdminCarsScreen';
+import MyBookingsScreen from '../screens/MyBookingsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -48,9 +50,11 @@ function ProfileStack() {
   return (
     <Stack.Navigator screenOptions={noHeader}>
       <Stack.Screen name="ProfileMain" component={ProfileScreen} />
+      <Stack.Screen name="MyBookings" component={MyBookingsScreen} />
       <Stack.Screen name="Settings" component={SettingsScreen} />
       <Stack.Screen name="Verify" component={VerifyScreen} />
       <Stack.Screen name="Notifications" component={NotificationsScreen} />
+      <Stack.Screen name="AdminCars" component={AdminCarsScreen} />
     </Stack.Navigator>
   );
 }

@@ -5,6 +5,7 @@ const ProfileContext = createContext();
 const DEFAULT = {
   name: 'Will Smith',
   email: 'willsmith@gmail.com',
+  role: 'CLIENT',
   city: 'Warszawa',
   birthDate: '25.09.1968',
   about: 'Amerykański aktor, reżyser i\npiosenkarz hip-hopowy',

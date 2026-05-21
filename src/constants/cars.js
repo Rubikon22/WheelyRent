@@ -113,4 +113,10 @@ export const CARS = [
   },
 ];
 
-export const EXTRA_OPTION_PRICE = 30;
+// perDay: true -> billed per rental day; false -> one-time fee
+export const EXTRA_OPTIONS = [
+  { id: 'delivery',   label: 'Dostawa na miejsce',      price: 49, perDay: false },
+  { id: 'childseat',  label: 'Fotelik dziecięcy',       price: 25, perDay: true },
+  { id: 'cargo',      label: 'Transport ciężarowy',     price: 79, perDay: false },
+  { id: 'twoseat',    label: 'Transport dwumiejscowy',  price: 59, perDay: false },
+];
