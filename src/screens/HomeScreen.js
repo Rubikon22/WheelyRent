@@ -3,7 +3,7 @@ import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Activi
 import { COLORS } from '../constants/theme';
 import { CARS } from '../constants/cars';
 import { Icon } from '../components/Icons';
-import CarPlaceholder from '../components/CarPlaceholder';
+import CarImage from '../components/CarImage';
 import Screen from '../components/Screen';
 import { api } from '../api/client';
 import { normalizeCars } from '../utils/cars';
@@ -84,7 +84,7 @@ export default function HomeScreen({ navigation }) {
                 activeOpacity={0.8}
                 onPress={() => navigation.navigate('CarDetails', { carId: car.serverId || car.id, car })}
               >
-                <CarPlaceholder kind={car.localId || car.id} style={s.carImg} />
+                <CarImage car={car} style={s.carImg} />
                 <View style={s.carMeta}>
                   <Text style={s.carName}>{car.name}</Text>
                   <Text style={s.carPrice}>{car.priceLabel}</Text>

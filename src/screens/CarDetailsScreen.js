@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { COLORS } from '../constants/theme';
-import CarPlaceholder from '../components/CarPlaceholder';
+import CarImage from '../components/CarImage';
 import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
 import BackHeader from '../components/BackHeader';
@@ -35,7 +35,7 @@ export default function CarDetailsScreen({ route, navigation }) {
     <Screen>
       <BackHeader navigation={navigation} />
       <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-        <CarPlaceholder kind={car.localId || car.id} style={s.heroImg} />
+        <CarImage car={car} style={s.heroImg} />
         <Text style={s.name}>{car.name}</Text>
 
         <View style={s.ratingRow}>

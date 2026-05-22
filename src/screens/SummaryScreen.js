@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { COLORS } from '../constants/theme';
-import CarPlaceholder from '../components/CarPlaceholder';
+import CarImage from '../components/CarImage';
 import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
 import BackHeader from '../components/BackHeader';
@@ -27,7 +27,7 @@ export default function SummaryScreen({ route, navigation }) {
       <BackHeader navigation={navigation} />
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
         <Text style={s.title}>Podsumowanie zamowienia</Text>
-        <CarPlaceholder kind={car.localId || car.id} style={s.heroImg} />
+        <CarImage car={car} style={s.heroImg} />
 
         <View style={s.details}>
           <Text style={s.line}>Samochod: {car.short}</Text>
