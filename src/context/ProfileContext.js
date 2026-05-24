@@ -8,7 +8,7 @@ const DEFAULT = {
   role: 'CLIENT',
   city: 'Warszawa',
   birthDate: '25.09.1968',
-  about: 'Amerykański aktor, reżyser i\npiosenkarz hip-hopowy',
+  about: '',
   avatarUri: null,
   cards: [
     { id: '1', type: 'visa', last4: '1234' },

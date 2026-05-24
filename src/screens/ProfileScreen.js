@@ -1,10 +1,12 @@
 import React from 'react';
-import { View, Text, Image, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { CommonActions } from '@react-navigation/native';
 import { COLORS } from '../constants/theme';
 import { Icon } from '../components/Icons';
 import { BtnOutline } from '../components/Btn';
 import Screen from '../components/Screen';
 import { useProfile } from '../context/ProfileContext';
+import { clearToken } from '../api/client';
 
 function DocStatus({ label, doc }) {
   return (
@@ -79,6 +81,18 @@ export default function ProfileScreen({ navigation }) {
           O sobie:{'\n'}
           {profile.about}
         </Text>
+
+        <TouchableOpacity
+          style={s.logoutBtn}
+          onPress={() => {
+            clearToken();
+            navigation.dispatch(
+              CommonActions.reset({ index: 0, routes: [{ name: 'Login' }] })
+            );
+          }}
+        >
+          <Text style={s.logoutText}>Wyloguj się</Text>
+        </TouchableOpacity>
       </ScrollView>
     </Screen>
   );
@@ -108,4 +122,9 @@ const s = StyleSheet.create({
 
   infoLabel: { alignSelf: 'flex-start', marginTop: 18, fontWeight: '800', fontStyle: 'italic', fontSize: 13, color: COLORS.text },
   infoText: { alignSelf: 'flex-start', marginTop: 10, fontSize: 12, fontWeight: '700', lineHeight: 22, fontStyle: 'italic', color: COLORS.text },
+  logoutBtn: {
+    marginTop: 24, paddingVertical: 12, paddingHorizontal: 32,
+    borderRadius: 22, borderWidth: 1.5, borderColor: '#ef4444',
+  },
+  logoutText: { color: '#ef4444', fontWeight: '700', fontSize: 14 },
 });

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '../constants/theme';
-import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
+import BackHeader from '../components/BackHeader';
 
 const ROWS = [
   { t: 'Promocje', s: 'Otrzymuj oferty specjalne' },
@@ -15,6 +15,7 @@ export default function NotificationsScreen({ navigation }) {
 
   return (
     <Screen>
+      <BackHeader navigation={navigation} />
       <Text style={st.title}>Wiadomości</Text>
 
       <View style={{ marginTop: 18, gap: 12 }}>
@@ -35,7 +36,6 @@ export default function NotificationsScreen({ navigation }) {
       </View>
 
       <View style={{ flex: 1 }} />
-      <BtnPrimary title="Wstecz" onPress={() => navigation.goBack()} />
     </Screen>
   );
 }

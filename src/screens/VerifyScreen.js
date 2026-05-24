@@ -5,6 +5,7 @@ import { COLORS } from '../constants/theme';
 import { Icon } from '../components/Icons';
 import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
+import BackHeader from '../components/BackHeader';
 import { useProfile } from '../context/ProfileContext';
 
 function DocForm({ title, iconName, doc, onSave, onRemove }) {
@@ -87,15 +88,26 @@ function DocForm({ title, iconName, doc, onSave, onRemove }) {
         onChangeText={setNumber}
         placeholder="np. ABC 123456"
         placeholderTextColor={COLORS.textMute}
+        maxLength={9}
       />
 
       <Text style={s.label}>Ważny do (opcjonalnie)</Text>
       <TextInput
         style={s.input}
         value={expiry}
-        onChangeText={setExpiry}
+        onChangeText={(text) => {
+          const digits = text.replace(/[^0-9]/g, '');
+          let formatted = '';
+          for (let i = 0; i < digits.length && i < 8; i++) {
+            if (i === 2 || i === 4) formatted += '.';
+            formatted += digits[i];
+          }
+          setExpiry(formatted);
+        }}
         placeholder="DD.MM.RRRR"
         placeholderTextColor={COLORS.textMute}
+        maxLength={10}
+        keyboardType="number-pad"
       />
 
       <View style={s.formActions}>
@@ -117,6 +129,7 @@ export default function VerifyScreen({ navigation }) {
 
   return (
     <Screen>
+      <BackHeader navigation={navigation} />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 20 }}>
         <Text style={s.brand}>WheelyRent</Text>
         <Text style={s.desc}>
@@ -140,7 +153,6 @@ export default function VerifyScreen({ navigation }) {
         />
       </ScrollView>
 
-      <BtnPrimary title="Wstecz" onPress={() => navigation.goBack()} />
     </Screen>
   );
 }

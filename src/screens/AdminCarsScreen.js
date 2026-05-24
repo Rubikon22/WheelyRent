@@ -3,6 +3,7 @@ import { Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View 
 import { COLORS } from '../constants/theme';
 import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
+import BackHeader from '../components/BackHeader';
 import { api } from '../api/client';
 import { normalizeCars } from '../utils/cars';
 
@@ -28,7 +29,7 @@ function toPayload(form) {
   };
 }
 
-export default function AdminCarsScreen() {
+export default function AdminCarsScreen({ navigation }) {
   const [cars, setCars] = useState([]);
   const [form, setForm] = useState(EMPTY);
   const [editingId, setEditingId] = useState(null);
@@ -97,6 +98,7 @@ export default function AdminCarsScreen() {
 
   return (
     <Screen>
+      <BackHeader navigation={navigation} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={s.title}>Panel administratora</Text>
 

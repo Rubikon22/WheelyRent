@@ -3,8 +3,8 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { COLORS } from '../constants/theme';
 import { CARS } from '../constants/cars';
 import { StarRow } from '../components/Icons';
-import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
+import BackHeader from '../components/BackHeader';
 
 export default function ReviewsScreen({ route, navigation }) {
   const car = route.params?.car || CARS.find(c => c.id === route.params.carId);
@@ -12,6 +12,7 @@ export default function ReviewsScreen({ route, navigation }) {
 
   return (
     <Screen>
+      <BackHeader navigation={navigation} />
       <Text style={s.title}>Opinie i oceny{'\n'}innych użytkowników</Text>
 
       <View style={s.ratingRow}>
@@ -41,7 +42,6 @@ export default function ReviewsScreen({ route, navigation }) {
         </View>
       </ScrollView>
 
-      <BtnPrimary title="Home" onPress={() => navigation.popToTop()} style={{ marginBottom: 4 }} />
     </Screen>
   );
 }

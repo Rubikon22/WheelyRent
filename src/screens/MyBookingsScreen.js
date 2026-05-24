@@ -4,6 +4,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { COLORS } from '../constants/theme';
 import CarPlaceholder from '../components/CarPlaceholder';
 import Screen from '../components/Screen';
+import BackHeader from '../components/BackHeader';
 import { api } from '../api/client';
 
 function fmtDate(iso) {
@@ -21,7 +22,7 @@ function daysBetween(start, end) {
   return diff > 0 ? diff : 1;
 }
 
-export default function MyBookingsScreen() {
+export default function MyBookingsScreen({ navigation }) {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -76,6 +77,7 @@ export default function MyBookingsScreen() {
 
   return (
     <Screen>
+      <BackHeader navigation={navigation} />
       <Text style={s.title}>Moje rezerwacje</Text>
 
       {loading ? (

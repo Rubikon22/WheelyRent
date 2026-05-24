@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { COLORS } from '../constants/theme';
 import { Icon } from '../components/Icons';
 import Screen from '../components/Screen';
+import BackHeader from '../components/BackHeader';
 
 const ANSWERS = {
   report: {
@@ -23,12 +24,13 @@ const ANSWERS = {
   },
 };
 
-export default function HelpAnswerScreen({ route }) {
+export default function HelpAnswerScreen({ route, navigation }) {
   const data = ANSWERS[route.params.key];
   if (!data) return null;
 
   return (
     <Screen>
+      <BackHeader navigation={navigation} />
       <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={s.title}>Centrum pomocy</Text>
 

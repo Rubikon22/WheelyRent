@@ -45,8 +45,8 @@ export default function PaymentScreen({ route, navigation }) {
 
   const handleAdd = () => {
     const digits = newNum.replace(/\s/g, '');
-    if (digits.length < 4) {
-      Alert.alert('Blad', 'Podaj przynajmniej 4 ostatnie cyfry karty');
+    if (digits.length !== 16) {
+      Alert.alert('Blad', 'Podaj pelny 16-cyfrowy numer karty');
       return;
     }
     addCard({ type: newType, last4: digits.slice(-4) });
@@ -130,12 +130,12 @@ export default function PaymentScreen({ route, navigation }) {
           </View>
           <TextInput
             style={s.input}
-            placeholder="Numer karty"
+            placeholder="Numer karty (16 cyfr)"
             placeholderTextColor={COLORS.textMute}
             value={newNum}
-            onChangeText={setNewNum}
+            onChangeText={(text) => setNewNum(text.replace(/[^0-9]/g, ''))}
             keyboardType="number-pad"
-            maxLength={19}
+            maxLength={16}
           />
           <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
             <TouchableOpacity style={s.confirmBtn} onPress={handleAdd}>

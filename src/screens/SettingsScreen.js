@@ -5,6 +5,7 @@ import { COLORS } from '../constants/theme';
 import { Icon } from '../components/Icons';
 import { BtnPrimary } from '../components/Btn';
 import Screen from '../components/Screen';
+import BackHeader from '../components/BackHeader';
 import { useProfile } from '../context/ProfileContext';
 
 function CardIcon({ type }) {
@@ -62,8 +63,8 @@ export default function SettingsScreen({ navigation }) {
 
   const handleAddCard = () => {
     const digits = newCardNumber.replace(/\s/g, '');
-    if (digits.length < 4) {
-      Alert.alert('Błąd', 'Podaj przynajmniej 4 ostatnie cyfry karty');
+    if (digits.length !== 16) {
+      Alert.alert('Błąd', 'Podaj pełny 16-cyfrowy numer karty');
       return;
     }
     const last4 = digits.slice(-4);
@@ -85,6 +86,7 @@ export default function SettingsScreen({ navigation }) {
 
   return (
     <Screen>
+      <BackHeader navigation={navigation} />
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <Text style={s.title}>Ustawienia konta</Text>
 
@@ -113,7 +115,23 @@ export default function SettingsScreen({ navigation }) {
           <TextInput style={s.input} value={city} onChangeText={setCity} placeholderTextColor={COLORS.textMute} />
 
           <Text style={s.label}>Data urodzenia</Text>
-          <TextInput style={s.input} value={birthDate} onChangeText={setBirthDate} placeholder="DD.MM.RRRR" placeholderTextColor={COLORS.textMute} />
+          <TextInput
+            style={s.input}
+            value={birthDate}
+            onChangeText={(text) => {
+              const digits = text.replace(/[^0-9]/g, '');
+              let formatted = '';
+              for (let i = 0; i < digits.length && i < 8; i++) {
+                if (i === 2 || i === 4) formatted += '.';
+                formatted += digits[i];
+              }
+              setBirthDate(formatted);
+            }}
+            placeholder="DD.MM.RRRR"
+            placeholderTextColor={COLORS.textMute}
+            maxLength={10}
+            keyboardType="number-pad"
+          />
 
           <Text style={s.label}>O sobie</Text>
           <TextInput
@@ -162,12 +180,12 @@ export default function SettingsScreen({ navigation }) {
             </View>
             <TextInput
               style={s.input}
-              placeholder="Numer karty (min. 4 ostatnie cyfry)"
+              placeholder="Numer karty (16 cyfr)"
               placeholderTextColor={COLORS.textMute}
               value={newCardNumber}
-              onChangeText={setNewCardNumber}
+              onChangeText={(text) => setNewCardNumber(text.replace(/[^0-9]/g, ''))}
               keyboardType="number-pad"
-              maxLength={19}
+              maxLength={16}
             />
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 8 }}>
               <TouchableOpacity style={s.addConfirmBtn} onPress={handleAddCard}>
