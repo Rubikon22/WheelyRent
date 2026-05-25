@@ -63,6 +63,10 @@ export default function RegisterScreen({ navigation }) {
         </TouchableOpacity>
 
         <BtnPrimary title={loading ? 'Rejestracja...' : 'Zarejestruj się'} onPress={handleRegister} style={{ marginTop: 22 }} />
+
+        <TouchableOpacity onPress={() => navigation.navigate('Login')} style={{ marginTop: 16 }}>
+          <Text style={s.loginLink}>Masz już konto? <Text style={s.loginLinkBold}>Zaloguj się</Text></Text>
+        </TouchableOpacity>
       </ScrollView>
     </Screen>
   );
@@ -81,4 +85,6 @@ const s = StyleSheet.create({
   dot: { width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', marginTop: 2 },
   dotEmpty: { backgroundColor: 'transparent', borderWidth: 1.5, borderColor: '#fff' },
   checkText: { color: COLORS.text, fontSize: 13, fontWeight: '700', lineHeight: 18 },
+  loginLink: { color: COLORS.textMute, fontSize: 13, fontWeight: '600' },
+  loginLinkBold: { color: COLORS.primary, fontWeight: '800' },
 });

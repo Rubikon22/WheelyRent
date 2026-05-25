@@ -16,6 +16,7 @@ const DEFAULT = {
   ],
   drivingLicense: null,
   idCard: null,
+  notifications: {},
 };
 
 let cardIdCounter = 3;

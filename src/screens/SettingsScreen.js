@@ -133,12 +133,13 @@ export default function SettingsScreen({ navigation }) {
             keyboardType="number-pad"
           />
 
-          <Text style={s.label}>O sobie</Text>
+          <Text style={s.label}>O sobie ({about.length}/500)</Text>
           <TextInput
             style={[s.input, { height: 80, textAlignVertical: 'top' }]}
             value={about}
             onChangeText={setAbout}
             multiline
+            maxLength={500}
             placeholderTextColor={COLORS.textMute}
           />
         </View>

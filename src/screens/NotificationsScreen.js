@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '../constants/theme';
 import Screen from '../components/Screen';
 import BackHeader from '../components/BackHeader';
+import { useProfile } from '../context/ProfileContext';
 
 const ROWS = [
   { t: 'Promocje', s: 'Otrzymuj oferty specjalne' },
@@ -11,7 +12,12 @@ const ROWS = [
 ];
 
 export default function NotificationsScreen({ navigation }) {
-  const [toggled, setToggled] = useState({});
+  const { profile, updateProfile } = useProfile();
+  const toggled = profile.notifications || {};
+
+  const toggle = (key) => {
+    updateProfile({ notifications: { ...toggled, [key]: !toggled[key] } });
+  };
 
   return (
     <Screen>
@@ -24,7 +30,7 @@ export default function NotificationsScreen({ navigation }) {
             key={r.t}
             style={st.card}
             activeOpacity={0.8}
-            onPress={() => setToggled(p => ({ ...p, [r.t]: !p[r.t] }))}
+            onPress={() => toggle(r.t)}
           >
             <View style={{ flex: 1 }}>
               <Text style={st.cardTitle}>{r.t}</Text>
